@@ -24,32 +24,73 @@
   h1.title{ font-size: 1.9rem; margin-bottom: 8px; }
   .subtitle{ color: rgba(241,233,212,0.6); font-size:0.95rem; margin-bottom: 34px; }
 
-  .pacote-options{ display:flex; flex-direction:column; gap:10px; margin-bottom: 10px; }
-  .pacote-opt{
-    display:flex; align-items:center; gap:12px; cursor:pointer;
-    border:1px solid rgba(241,233,212,0.14); border-radius:10px; padding: 14px 16px;
-    transition: border-color .2s ease, background .2s ease;
+  /* ===== passo 1: escolha do pacote com prévia ===== */
+  .pacote-cards{ display:flex; flex-direction:column; gap:16px; margin-bottom: 10px; }
+  .pacote-card{
+    border:1px solid rgba(241,233,212,0.14); border-radius:16px; overflow:hidden;
+    background: rgba(241,233,212,0.03);
+    transition: border-color .2s ease, transform .2s ease;
   }
-  .pacote-opt:has(input:checked){ border-color: var(--amber); background: rgba(226,153,47,0.08); }
-  .pacote-opt input{ accent-color: var(--amber); width:16px; height:16px; }
-  .pacote-opt .titulo{ font-weight:600; font-size:0.95rem; }
-  .pacote-opt .desc{ display:block; font-size:0.78rem; color: rgba(241,233,212,0.5); margin-top:2px; }
-  .pacote-opt .preco{ margin-left:auto; font-family:'Fraunces', serif; font-size:1.1rem; color: var(--amber); }
+  .pacote-card:hover{ border-color: rgba(226,153,47,0.5); }
+  .pacote-card.selecionado{ border-color: var(--amber); background: rgba(226,153,47,0.06); }
 
-  .pacote-options{ margin-bottom: 0; }
-  .pacote-opt{ flex-wrap:wrap; gap:10px 14px; }
-  .btn-pagar{
-    width:100%; background: var(--wax); color: var(--paper); border:none;
-    padding: 12px 16px; border-radius:999px; font-weight:600; font-size:0.9rem; cursor:pointer;
+  /* mini-mockup ilustrando como fica a carta */
+  .mockup{
+    background: var(--paper); color: var(--ink); padding: 18px 20px 16px;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .mockup .m-eyebrow{ font-family:'Caveat', cursive; color: var(--sage); font-size:0.95rem; }
+  .mockup .m-titulo{ font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; margin: 2px 0 8px; }
+  .mockup .m-linha{ width:26px; height:2px; background: var(--amber); border-radius:2px; margin-bottom:10px; }
+  .mockup .m-fotos{ display:flex; gap:6px; margin-bottom:8px; }
+  .mockup .m-foto{
+    width:34px; height:34px; border-radius:3px;
+    background: linear-gradient(135deg, rgba(138,54,42,0.25), rgba(226,153,47,0.35));
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  .mockup .m-foto:nth-child(odd){ transform: rotate(-4deg); }
+  .mockup .m-foto:nth-child(even){ transform: rotate(3deg); }
+  .mockup .m-video{
+    width:64px; height:38px; border-radius:5px; margin-top:4px;
+    background: rgba(28,36,48,0.85);
+    display:flex; align-items:center; justify-content:center;
+    position:relative;
+  }
+  .mockup .m-video::after{
+    content:''; width:0; height:0;
+    border-left: 8px solid var(--paper); border-top:5px solid transparent; border-bottom:5px solid transparent;
+    margin-left:2px;
+  }
+  .mockup .m-video.moldura{ border:2px dashed rgba(226,153,47,0.6); padding:2px; }
+  .mockup .m-legenda{
+    font-family:'Caveat', cursive; font-size:0.7rem; background: rgba(28,36,48,0.75); color: var(--paper);
+    padding: 2px 8px; border-radius:999px; margin-top:-14px; z-index:1;
+  }
+  .mockup .m-nota{ font-size:0.85rem; margin-top:6px; opacity:0.7; }
+
+  .pacote-info{ padding: 14px 18px 16px; display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+  .pacote-info .txt{ flex:1; min-width:160px; }
+  .pacote-info .titulo{ font-weight:600; font-size:0.98rem; }
+  .pacote-info .desc{ display:block; font-size:0.8rem; color: rgba(241,233,212,0.55); margin-top:3px; }
+  .pacote-info .preco{ font-family:'Fraunces', serif; font-size:1.25rem; color: var(--amber); white-space:nowrap; }
+  .btn-escolher{
+    width:100%; margin-top:12px; background: rgba(241,233,212,0.1); color: var(--paper); border:none;
+    padding: 11px 16px; border-radius:999px; font-weight:600; font-size:0.88rem; cursor:pointer;
     transition: background .2s ease;
   }
-  .btn-pagar:hover{ background:#9c4030; }
-  .btn-pagar:disabled{ opacity:0.5; cursor:not-allowed; }
+  .pacote-card.selecionado .btn-escolher{ background: var(--wax); }
+  .btn-escolher:hover{ background: rgba(241,233,212,0.18); }
+  .pacote-card.selecionado .btn-escolher:hover{ background:#9c4030; }
 
   .pacote-confirmado{
     background: rgba(226,153,47,0.1); border:1px solid rgba(226,153,47,0.3);
     border-radius:10px; padding: 12px 16px; margin-bottom: 10px;
     font-size:0.9rem; color: var(--amber); font-weight:600;
+    display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+  }
+  .pacote-confirmado button{
+    background:none; border:1px solid rgba(226,153,47,0.4); color: var(--amber);
+    border-radius:999px; padding:5px 12px; font-size:0.75rem; font-weight:600; cursor:pointer;
   }
 
   label{ display:block; font-size:0.85rem; font-weight:600; margin: 22px 0 8px; color: rgba(241,233,212,0.8); }
@@ -125,33 +166,92 @@
 <div class="wrap">
   <div class="eyebrow">Dia dos Pais</div>
   <h1 class="title" id="titulo-principal">Escolha seu pacote</h1>
-  <p class="subtitle" id="subtitulo-principal">Escolha e pague pra liberar o formulário de criação da homenagem.</p>
+  <p class="subtitle" id="subtitulo-principal">Veja como fica cada opção. Você paga só depois de criar a sua homenagem.</p>
 
-  <div id="pagamento-step">
-    <div class="pacote-options" id="pacote-options">
-      <div class="pacote-opt" style="cursor:default;">
-        <span><span class="titulo">Simples</span><span class="desc">Até 3 fotos, sem vídeo</span></span>
-        <span class="preco">R$29</span>
-        <button class="btn-pagar" data-pacote="simples">Pagar e continuar</button>
+  <!-- ===== passo 1: escolha com prévia visual ===== -->
+  <div id="step-pacote">
+    <div class="pacote-cards" id="pacote-cards">
+
+      <div class="pacote-card" data-pacote="simples">
+        <div class="mockup">
+          <div class="m-eyebrow">para Reginaldo</div>
+          <div class="m-titulo">Feliz Dia dos Pais</div>
+          <div class="m-linha"></div>
+          <div class="m-fotos">
+            <div class="m-foto"></div><div class="m-foto"></div><div class="m-foto"></div>
+          </div>
+          <div class="m-nota">só texto e fotos</div>
+        </div>
+        <div class="pacote-info">
+          <div class="txt">
+            <span class="titulo">Simples</span>
+            <span class="desc">Até 3 fotos, sem vídeo</span>
+          </div>
+          <span class="preco">R$29</span>
+        </div>
+        <div style="padding: 0 18px 18px;">
+          <button class="btn-escolher" data-pacote="simples">Escolher este pacote</button>
+        </div>
       </div>
-      <div class="pacote-opt" style="cursor:default;">
-        <span><span class="titulo">Completa</span><span class="desc">Até 6 fotos + vídeo (até 1 min)</span></span>
-        <span class="preco">R$49</span>
-        <button class="btn-pagar" data-pacote="completa">Pagar e continuar</button>
+
+      <div class="pacote-card" data-pacote="completa">
+        <div class="mockup">
+          <div class="m-eyebrow">para Reginaldo</div>
+          <div class="m-titulo">Feliz Dia dos Pais</div>
+          <div class="m-linha"></div>
+          <div class="m-fotos">
+            <div class="m-foto"></div><div class="m-foto"></div><div class="m-foto"></div>
+          </div>
+          <div class="m-video"></div>
+          <div class="m-nota">fotos + vídeo até 1 min</div>
+        </div>
+        <div class="pacote-info">
+          <div class="txt">
+            <span class="titulo">Completa</span>
+            <span class="desc">Até 6 fotos + vídeo (até 1 min)</span>
+          </div>
+          <span class="preco">R$49</span>
+        </div>
+        <div style="padding: 0 18px 18px;">
+          <button class="btn-escolher" data-pacote="completa">Escolher este pacote</button>
+        </div>
       </div>
-      <div class="pacote-opt" style="cursor:default;">
-        <span><span class="titulo">Para sempre</span><span class="desc">Até 10 fotos + vídeo (até 2 min), legenda e moldura especial</span></span>
-        <span class="preco">R$79</span>
-        <button class="btn-pagar" data-pacote="para-sempre">Pagar e continuar</button>
+
+      <div class="pacote-card" data-pacote="para-sempre">
+        <div class="mockup">
+          <div class="m-eyebrow">para Reginaldo</div>
+          <div class="m-titulo">Feliz Dia dos Pais</div>
+          <div class="m-linha"></div>
+          <div class="m-fotos">
+            <div class="m-foto"></div><div class="m-foto"></div><div class="m-foto"></div>
+          </div>
+          <div class="m-legenda">Feliz Dia dos Pais! 💛</div>
+          <div class="m-video moldura"></div>
+          <div class="m-nota">fotos + vídeo com moldura, legenda e música</div>
+        </div>
+        <div class="pacote-info">
+          <div class="txt">
+            <span class="titulo">Para sempre</span>
+            <span class="desc">Até 10 fotos + vídeo (até 2 min), legenda e moldura especial</span>
+          </div>
+          <span class="preco">R$79</span>
+        </div>
+        <div style="padding: 0 18px 18px;">
+          <button class="btn-escolher" data-pacote="para-sempre">Escolher este pacote</button>
+        </div>
       </div>
+
     </div>
-    <div class="status" id="status-pagamento"></div>
   </div>
 
+  <!-- ===== passo 2: formulário (só aparece após escolher o pacote) ===== -->
   <form id="form" style="display:none;">
-    <div class="pacote-confirmado" id="pacote-confirmado"></div>
+    <div class="pacote-confirmado" id="pacote-confirmado">
+      <span></span>
+      <button type="button" id="btn-trocar-pacote">Trocar pacote</button>
+    </div>
 
-    <label>Nome de quem vai receber</label>
+    <label class="first">Nome de quem vai receber</label>
     <input type="text" id="f-nome" placeholder="Ex: Reginaldo" required>
 
     <label>Mensagem</label>
@@ -192,7 +292,7 @@
       <option value="alegre">Alegre (clima de família)</option>
     </select>
 
-    <button type="submit" class="btn" id="btn-enviar">Gerar homenagem</button>
+    <button type="submit" class="btn" id="btn-enviar">Pagar e gerar homenagem</button>
     <div class="status" id="status"></div>
   </form>
 
@@ -217,8 +317,8 @@
   const SUPABASE_KEY = 'sb_publishable_Mb95GWTd_r6lJEin6zoE5g_OAAurcW9';
   const BUCKET = 'homenagens-arquivos'; // nome exato do bucket criado no Supabase
   const VIDEO_MAX_MB = 50;
-  // Depois de publicar o site, troque esta linha pelo domínio real, ex: 'https://cartasaopai.netlify.app/ver.html'
   const VIEW_BASE_URL = window.location.origin + window.location.pathname.replace('index.html', '') + 'ver.html';
+  const DRAFT_KEY = 'cartaAoPaiDraft';
   // ================================================================
 
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -229,11 +329,38 @@
     'para-sempre': { maxFotos: 10, video: true,  videoMaxSeg: 120, legenda: true }
   };
   const NOMES_PACOTE = { 'simples': 'Simples', 'completa': 'Completa', 'para-sempre': 'Para sempre' };
-  let pacoteConfirmadoValor = null;
+  let pacoteEscolhido = null;
 
   function pacoteAtual(){
-    return pacoteConfirmadoValor || 'simples';
+    return pacoteEscolhido || 'simples';
   }
+
+  // --- passo 1: escolher pacote (sem pagar ainda) ---
+  function escolherPacote(pacote){
+    pacoteEscolhido = pacote;
+    document.querySelectorAll('.pacote-card').forEach(c => {
+      c.classList.toggle('selecionado', c.dataset.pacote === pacote);
+    });
+    document.getElementById('step-pacote').style.display = 'none';
+    document.getElementById('form').style.display = 'block';
+    document.getElementById('titulo-principal').textContent = 'Criar uma homenagem';
+    document.getElementById('subtitulo-principal').textContent = 'Preencha os campos abaixo. O pagamento acontece só no final.';
+    document.querySelector('#pacote-confirmado span').textContent = `Pacote escolhido: ${NOMES_PACOTE[pacote]}`;
+    aplicarLimitesPacote();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.btn-escolher').forEach(btn => {
+    btn.addEventListener('click', () => escolherPacote(btn.dataset.pacote));
+  });
+
+  document.getElementById('btn-trocar-pacote').addEventListener('click', () => {
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('step-pacote').style.display = 'block';
+    document.getElementById('titulo-principal').textContent = 'Escolha seu pacote';
+    document.getElementById('subtitulo-principal').textContent = 'Veja como fica cada opção. Você paga só depois de criar a sua homenagem.';
+  });
+
   function aplicarLimitesPacote(){
     const limites = PACOTE_LIMITES[pacoteAtual()];
     if(fotosSelecionadas.length > limites.maxFotos){
@@ -247,69 +374,6 @@
       videoSelecionado = null;
       videoInput.value = '';
       videoPreview.innerHTML = '';
-    }
-  }
-
-  // --- fluxo de pagamento ---
-  document.querySelectorAll('.btn-pagar').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const pacote = btn.dataset.pacote;
-      const statusEl = document.getElementById('status-pagamento');
-      document.querySelectorAll('.btn-pagar').forEach(b => b.disabled = true);
-      statusEl.textContent = 'Preparando pagamento...';
-      statusEl.classList.remove('error');
-      try{
-        const res = await fetch('/.netlify/functions/criar-pagamento', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pacote })
-        });
-        const dados = await res.json();
-        if(!res.ok || !dados.init_point) throw new Error('Falha ao gerar pagamento');
-        window.location.href = dados.init_point;
-      }catch(err){
-        console.error(err);
-        statusEl.textContent = 'Não foi possível iniciar o pagamento agora. Tente novamente.';
-        statusEl.classList.add('error');
-        document.querySelectorAll('.btn-pagar').forEach(b => b.disabled = false);
-      }
-    });
-  });
-
-  async function conferirRetornoPagamento(){
-    const params = new URLSearchParams(window.location.search);
-    const paymentId = params.get('payment_id');
-    const status = params.get('status');
-    const statusEl = document.getElementById('status-pagamento');
-
-    if(!paymentId){ return; } // primeira visita, sem pagamento ainda
-
-    if(status !== 'approved'){
-      statusEl.textContent = 'Pagamento não aprovado. Tente novamente ou escolha outro pacote.';
-      statusEl.classList.add('error');
-      return;
-    }
-
-    statusEl.textContent = 'Confirmando pagamento...';
-    try{
-      const res = await fetch(`/.netlify/functions/verificar-pagamento?payment_id=${paymentId}`);
-      const dados = await res.json();
-      if(dados.aprovado && PACOTE_LIMITES[dados.pacote]){
-        pacoteConfirmadoValor = dados.pacote;
-        document.getElementById('pagamento-step').style.display = 'none';
-        document.getElementById('form').style.display = 'block';
-        document.getElementById('titulo-principal').textContent = 'Criar uma homenagem';
-        document.getElementById('subtitulo-principal').textContent = 'Preencha os campos abaixo. Suas fotos e vídeo sobem direto do seu aparelho.';
-        document.getElementById('pacote-confirmado').textContent = `✓ Pacote pago: ${NOMES_PACOTE[dados.pacote]}`;
-        aplicarLimitesPacote();
-      } else {
-        statusEl.textContent = 'Não conseguimos confirmar esse pagamento. Fale com o suporte se já pagou.';
-        statusEl.classList.add('error');
-      }
-    }catch(err){
-      console.error(err);
-      statusEl.textContent = 'Erro ao confirmar pagamento. Atualize a página.';
-      statusEl.classList.add('error');
     }
   }
 
@@ -361,7 +425,6 @@
       videoInput.value = '';
       return;
     }
-    // confere a duração do vídeo antes de aceitar
     const duracao = await new Promise((resolve) => {
       const testVid = document.createElement('video');
       testVid.preload = 'metadata';
@@ -415,6 +478,7 @@
     return c;
   }
 
+  // --- passo 3: preencheu tudo -> sobe arquivos, guarda rascunho, manda pagar ---
   document.getElementById('form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const nome = document.getElementById('f-nome').value.trim();
@@ -424,7 +488,7 @@
     const btn = document.getElementById('btn-enviar');
 
     if(!nome || !msg){ statusEl.textContent = 'Preencha nome e mensagem.'; statusEl.classList.add('error'); return; }
-    if(!pacoteConfirmadoValor){ statusEl.textContent = 'Pagamento não confirmado. Recarregue a página.'; statusEl.classList.add('error'); return; }
+    if(!pacoteEscolhido){ statusEl.textContent = 'Escolha um pacote antes de continuar.'; statusEl.classList.add('error'); return; }
 
     btn.disabled = true;
     statusEl.classList.remove('error');
@@ -455,31 +519,115 @@
         videoUrl = pub.publicUrl;
       }
 
-      // grava no banco
-      statusEl.textContent = 'Salvando homenagem...';
+      // guarda o rascunho no navegador — só grava no banco quando o pagamento voltar aprovado
       const legenda = document.getElementById('f-legenda').value.trim();
       const musica = document.getElementById('f-musica').value;
-      const { error: insErr } = await supabaseClient.from('homenagens').insert({
-        codigo, nome, mensagem: msg, assinado, fotos: fotoUrls, video_url: videoUrl, pacote: pacoteAtual(), legenda, musica
-      });
-      if(insErr) throw insErr;
+      const rascunho = {
+        codigo, nome, mensagem: msg, assinado,
+        fotos: fotoUrls, video_url: videoUrl,
+        pacote: pacoteEscolhido, legenda, musica
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(rascunho));
 
-      // sucesso
-      statusEl.textContent = '';
-      const link = `${VIEW_BASE_URL}?codigo=${codigo}`;
-      document.getElementById('link-final').value = link;
-      document.getElementById('btn-whatsapp').href = `https://wa.me/?text=${encodeURIComponent('Preparei uma homenagem especial pra você: ' + link)}`;
-      document.getElementById('result').classList.add('show');
-      document.getElementById('form').style.display = 'none';
+      // agora sim: inicia o pagamento
+      statusEl.textContent = 'Preparando pagamento...';
+      const res = await fetch('/.netlify/functions/criar-pagamento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pacote: pacoteEscolhido })
+      });
+      const dados = await res.json();
+      if(!res.ok || !dados.init_point) throw new Error('Falha ao gerar pagamento');
+      window.location.href = dados.init_point;
 
     }catch(err){
       console.error(err);
-      statusEl.textContent = 'Algo deu errado ao salvar. Tente novamente em instantes.';
+      statusEl.textContent = 'Algo deu errado ao preparar sua homenagem. Tente novamente em instantes.';
       statusEl.classList.add('error');
-    }finally{
       btn.disabled = false;
     }
   });
+
+  // --- ao voltar do Mercado Pago: confirma pagamento e só então grava a homenagem ---
+  async function conferirRetornoPagamento(){
+    const params = new URLSearchParams(window.location.search);
+    const paymentId = params.get('payment_id');
+    const status = params.get('status');
+
+    if(!paymentId){ return; } // primeira visita, sem pagamento ainda
+
+    // mostra uma tela de status enquanto confirma
+    document.getElementById('step-pacote').style.display = 'none';
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('titulo-principal').textContent = 'Confirmando pagamento...';
+    document.getElementById('subtitulo-principal').textContent = 'Só um instante.';
+    const statusEl = document.getElementById('status');
+    statusEl.style.display = 'block';
+    statusEl.classList.remove('error');
+
+    const rascunhoBruto = localStorage.getItem(DRAFT_KEY);
+    const rascunho = rascunhoBruto ? JSON.parse(rascunhoBruto) : null;
+
+    if(status !== 'approved'){
+      document.getElementById('titulo-principal').textContent = 'Pagamento não aprovado';
+      statusEl.textContent = 'Nenhum valor foi cobrado com sucesso. Você pode tentar novamente.';
+      statusEl.classList.add('error');
+      mostrarBotaoTentarNovamente();
+      return;
+    }
+
+    statusEl.textContent = 'Confirmando pagamento com o Mercado Pago...';
+    try{
+      const res = await fetch(`/.netlify/functions/verificar-pagamento?payment_id=${paymentId}`);
+      const dados = await res.json();
+
+      if(!dados.aprovado){
+        document.getElementById('titulo-principal').textContent = 'Pagamento não confirmado';
+        statusEl.textContent = 'Não conseguimos confirmar esse pagamento. Fale com o suporte se já pagou.';
+        statusEl.classList.add('error');
+        mostrarBotaoTentarNovamente();
+        return;
+      }
+
+      if(!rascunho || rascunho.pacote !== dados.pacote){
+        document.getElementById('titulo-principal').textContent = 'Pagamento aprovado';
+        statusEl.textContent = 'O pagamento foi aprovado, mas não encontramos os dados da sua homenagem neste aparelho. Fale com o suporte informando o pagamento aprovado.';
+        statusEl.classList.add('error');
+        return;
+      }
+
+      statusEl.textContent = 'Salvando sua homenagem...';
+      const { error: insErr } = await supabaseClient.from('homenagens').insert(rascunho);
+      if(insErr) throw insErr;
+
+      localStorage.removeItem(DRAFT_KEY);
+
+      // sucesso
+      statusEl.style.display = 'none';
+      document.getElementById('titulo-principal').textContent = 'Tudo pronto!';
+      document.getElementById('subtitulo-principal').textContent = '';
+      const link = `${VIEW_BASE_URL}?codigo=${rascunho.codigo}`;
+      document.getElementById('link-final').value = link;
+      document.getElementById('btn-whatsapp').href = `https://wa.me/?text=${encodeURIComponent('Preparei uma homenagem especial pra você: ' + link)}`;
+      document.getElementById('result').classList.add('show');
+
+    }catch(err){
+      console.error(err);
+      statusEl.textContent = 'Pagamento aprovado, mas houve um erro ao salvar a homenagem. Atualize a página pra tentar de novo.';
+      statusEl.classList.add('error');
+    }
+  }
+
+  function mostrarBotaoTentarNovamente(){
+    const statusEl = document.getElementById('status');
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.textContent = 'Tentar novamente';
+    btn.style.maxWidth = '260px';
+    btn.style.margin = '18px auto 0';
+    btn.onclick = () => { window.location.href = window.location.pathname; };
+    statusEl.insertAdjacentElement('afterend', btn);
+  }
 
   document.getElementById('btn-copiar').addEventListener('click', () => {
     const input = document.getElementById('link-final');
@@ -490,7 +638,7 @@
     setTimeout(() => btn.textContent = 'Copiar', 1500);
   });
 
-  document.getElementById('btn-nova').addEventListener('click', () => location.reload());
+  document.getElementById('btn-nova').addEventListener('click', () => { window.location.href = window.location.pathname; });
 
   conferirRetornoPagamento();
 </script>
