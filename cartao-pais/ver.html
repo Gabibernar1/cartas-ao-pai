@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uma homenagem pra você</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@400;500;600;700&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root{
+    --ink:#241C14; --ink-soft:rgba(36,28,20,0.68);
+    --paper:#F1E9D4; --desk:#1C2430; --amber:#C97E1D; --wax:#8A362A; --sage:#5F7052;
+    --line: rgba(36,28,20,0.16);
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ background: var(--paper); color: var(--ink); font-family:'Work Sans', sans-serif; line-height:1.6; }
+  h1,h2{ font-family:'Fraunces', serif; }
+  .wrap{ max-width: 720px; margin:0 auto; padding: 0 26px; }
+
+  /* estado de carregamento / erro */
+  #loading, #erro{
+    min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding: 20px;
+  }
+  #erro{ display:none; }
+  #erro h1{ font-size:1.6rem; margin-bottom:10px; }
+  #erro p{ color: var(--ink-soft); max-width: 40ch; }
+  .spinner{
+    width:34px; height:34px; border-radius:50%;
+    border: 3px solid rgba(36,28,20,0.15); border-top-color: var(--wax);
+    animation: spin 0.9s linear infinite; margin-bottom: 16px;
+  }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+
+  /* selo de abertura */
+  #envelope-screen{
+    position: fixed; inset:0; z-index: 200; background: var(--desk);
+    display:none; align-items:center; justify-content:center; flex-direction: column;
+    cursor: pointer; transition: opacity .6s ease, visibility .6s ease;
+  }
+  #envelope-screen.show{ display:flex; }
+  #envelope-screen.hidden{ opacity:0; visibility:hidden; pointer-events:none; }
+  .seal{
+    width: 84px; height: 84px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #d68a3a, var(--wax) 65%);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5); margin-bottom: 26px;
+    animation: pulse 2.6s ease-in-out infinite;
+  }
+  .seal svg{ width: 30px; height:30px; color: rgba(241,233,212,0.85); }
+  @keyframes pulse{ 0%,100%{ transform:scale(1);} 50%{ transform:scale(1.05);} }
+  #envelope-screen p{ color: rgba(241,233,212,0.8); font-family:'Caveat', cursive; font-size: 1.4rem; }
+
+  /* conteúdo principal */
+  #conteudo{ display:none; }
+  #conteudo.show{ display:block; }
+
+  header.hero{ padding: 90px 0 60px; text-align:center; }
+  .eyebrow{ font-family:'Caveat', cursive; color: var(--sage); font-size: 1.3rem; margin-bottom: 6px; }
+  header.hero h1{ font-size: clamp(2rem, 6vw, 2.9rem); font-weight:600; line-height:1.12; }
+  .divider{ width: 46px; height:2px; background: var(--amber); margin: 26px auto 0; border-radius:2px; }
+
+  .letter{ padding: 20px 0 50px; }
+  .letter p{ font-size: 1.35rem; font-family:'Caveat', cursive; font-weight:600; color: var(--ink); white-space: pre-wrap; line-height:1.5; }
+  .sign-off{ font-family:'Caveat', cursive; font-size: 1.6rem; color: var(--sage); margin-top: 30px; text-align:center; }
+
+  .gallery{ padding: 40px 0 60px; border-top: 1px dashed var(--line); }
+  .gallery .label{ font-family:'Caveat', cursive; font-size:1.3rem; color: var(--sage); text-align:center; margin-bottom: 34px; }
+  .grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 22px 18px; }
+
+  .slideshow-section{ padding: 10px 0 60px; text-align:center; border-top: 1px dashed var(--line); }
+  .slideshow-section .label{ font-family:'Caveat', cursive; font-size:1.3rem; color: var(--sage); margin-bottom: 24px; }
+  .slideshow{
+    position:relative; max-width: 420px; aspect-ratio: 1/1; margin: 0 auto;
+    border-radius: 14px; overflow:hidden; box-shadow: 0 20px 44px rgba(0,0,0,0.25);
+  }
+  .slideshow img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    opacity:0; transition: opacity 1.2s ease;
+  }
+  .slideshow img.ativa{ opacity:1; }
+  .slideshow-dots{ display:flex; gap:6px; justify-content:center; margin-top:14px; }
+  .slideshow-dots span{ width:6px; height:6px; border-radius:50%; background: rgba(36,28,20,0.2); transition: background .3s ease; }
+  .slideshow-dots span.ativa{ background: var(--amber); }
+  @media (max-width:560px){ .grid{ grid-template-columns: repeat(2,1fr); } }
+  .photo{ background: var(--paper); padding: 10px; box-shadow: 0 10px 24px rgba(0,0,0,0.18); border-radius: 2px; }
+  .photo:nth-child(odd){ transform: rotate(-2.5deg); }
+  .photo:nth-child(even){ transform: rotate(2deg); }
+  .photo img{ width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:1px; display:block; }
+
+  .video-section{ padding: 10px 0 60px; text-align:center; }
+  .video-section video{ max-width:460px; width:100%; border-radius: 10px; box-shadow: 0 20px 44px rgba(0,0,0,0.28); }
+  .video-wrapper{ position:relative; display:inline-block; max-width:460px; width:100%; }
+  .video-wrapper.moldura{ padding: 14px; background: linear-gradient(135deg, rgba(226,153,47,0.15), rgba(138,54,42,0.1)); border-radius: 18px; border: 2px dashed rgba(226,153,47,0.4); }
+  .video-wrapper.moldura video{ display:block; }
+  .video-legenda{
+    position:absolute; top: 26px; left:50%; transform: translateX(-50%);
+    background: rgba(28,36,48,0.75); color: var(--paper);
+    font-family:'Caveat', cursive; font-size:1.3rem;
+    padding: 6px 18px; border-radius: 999px; white-space:nowrap;
+    pointer-events:none;
+  }
+  .coracao{
+    position:absolute; font-size:1.1rem; opacity:0.85; pointer-events:none;
+    animation: flutuar 3.5s ease-in-out infinite;
+  }
+  @keyframes flutuar{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
+
+  .musica-player{ display:flex; align-items:center; justify-content:center; gap:10px; padding: 0 0 20px; }
+  .musica-player button{
+    background: rgba(36,28,20,0.08); color: var(--ink); border:none;
+    padding: 10px 16px; border-radius:999px; font-size:0.85rem; font-weight:600; cursor:pointer;
+  }
+  .musica-player button:hover{ background: rgba(36,28,20,0.14); }
+
+  .signatures{ padding: 30px 0 60px; border-top: 1px dashed var(--line); text-align: center; }
+  .signatures .label{ font-family:'Caveat', cursive; font-size:1.3rem; color: var(--sage); margin-bottom: 14px; }
+  .signatures .names{ font-family:'Fraunces', serif; font-style: italic; font-size: 1.2rem; }
+
+  /* barra de ações (fora da captura de imagem) */
+  .actions{
+    display:flex; gap:12px; justify-content:center; flex-wrap:wrap; padding: 0 0 70px;
+  }
+  .actions button{
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--wax); color: var(--paper); border:none;
+    padding: 12px 20px; border-radius:999px; font-weight:600; font-size:0.88rem; cursor:pointer;
+    transition: background .2s ease;
+  }
+  .actions button.secondary{ background: rgba(36,28,20,0.08); color: var(--ink); }
+  .actions button:hover{ opacity:0.9; }
+
+  footer{ text-align:center; padding: 20px 0 50px; font-size: 0.75rem; color: rgba(36,28,20,0.35); }
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p style="color:var(--ink-soft); font-size:0.9rem;">Abrindo a homenagem...</p>
+</div>
+
+<div id="erro">
+  <h1>Não encontramos essa homenagem</h1>
+  <p>Confira se o link está completo e correto, ou peça pra quem te enviou conferir o código.</p>
+</div>
+
+<div id="envelope-screen">
+  <div class="seal">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16v12H4z"/><path d="M4 6l8 7 8-7"/></svg>
+  </div>
+  <p>toque para abrir a carta</p>
+</div>
+
+<div id="conteudo">
+  <div id="captura">
+    <header class="hero">
+      <div class="wrap">
+        <div class="eyebrow" id="c-eyebrow"></div>
+        <h1 id="c-titulo">Feliz Dia dos Pais</h1>
+        <div class="divider"></div>
+      </div>
+    </header>
+
+    <section class="letter">
+      <div class="wrap">
+        <p id="c-mensagem"></p>
+        <div class="sign-off" id="c-sign" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section class="gallery" id="c-gallery-section" style="display:none;">
+      <div class="wrap">
+        <div class="label">alguns momentos</div>
+        <div class="grid" id="c-grid"></div>
+      </div>
+    </section>
+
+    <section class="slideshow-section" id="c-slideshow-section" style="display:none;">
+      <div class="wrap">
+        <div class="label">reviva esses momentos</div>
+        <div class="slideshow" id="c-slideshow"></div>
+        <div class="slideshow-dots" id="c-slideshow-dots"></div>
+      </div>
+    </section>
+
+    <section class="video-section" id="c-video-section" style="display:none;">
+      <div class="wrap">
+        <div class="video-wrapper" id="c-video-wrapper">
+          <video id="c-video" controls></video>
+        </div>
+      </div>
+    </section>
+
+    <div class="musica-player" id="musica-player" style="display:none;">
+      <audio id="c-audio" loop></audio>
+      <button id="btn-musica">🎵 Tocar música</button>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="btn-baixar">Baixar como imagem</button>
+    <button id="btn-compartilhar" class="secondary">Copiar link</button>
+  </div>
+
+  <footer>feito com carinho — Cartas ao Pai</footer>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://qezcktrjijknrcdzwhkl.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Mb95GWTd_r6lJEin6zoE5g_OAAurcW9';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const codigo = (params.get('codigo') || '').toUpperCase();
+
+  async function carregar(){
+    if(!codigo){ mostrarErro(); return; }
+    const { data, error } = await supabaseClient.from('homenagens').select('*').eq('codigo', codigo).single();
+    if(error || !data){ mostrarErro(); return; }
+    preencher(data);
+  }
+
+  function mostrarErro(){
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('erro').style.display = 'flex';
+  }
+
+  function preencher(data){
+    document.title = `Feliz Dia dos Pais, ${data.nome}`;
+    document.getElementById('c-eyebrow').textContent = `para ${data.nome}`;
+    document.getElementById('c-mensagem').textContent = data.mensagem;
+
+    if(data.assinado){
+      const sign = document.getElementById('c-sign');
+      sign.textContent = `com carinho, ${data.assinado}`;
+      sign.style.display = 'block';
+    }
+
+    if(data.fotos && data.fotos.length){
+      const grid = document.getElementById('c-grid');
+      data.fotos.forEach(url => {
+        const div = document.createElement('div');
+        div.className = 'photo';
+        const img = document.createElement('img');
+        img.src = url; img.crossOrigin = 'anonymous';
+        div.appendChild(img);
+        grid.appendChild(div);
+      });
+      document.getElementById('c-gallery-section').style.display = 'block';
+
+      // slideshow automático (só faz sentido com 2+ fotos)
+      if(data.fotos.length >= 2){
+        const slideshow = document.getElementById('c-slideshow');
+        const dotsBox = document.getElementById('c-slideshow-dots');
+        data.fotos.forEach((url, i) => {
+          const img = document.createElement('img');
+          img.src = url; img.crossOrigin = 'anonymous';
+          if(i === 0) img.classList.add('ativa');
+          slideshow.appendChild(img);
+          const dot = document.createElement('span');
+          if(i === 0) dot.classList.add('ativa');
+          dotsBox.appendChild(dot);
+        });
+        document.getElementById('c-slideshow-section').style.display = 'block';
+        let atual = 0;
+        setInterval(() => {
+          const imgs = slideshow.querySelectorAll('img');
+          const dots = dotsBox.querySelectorAll('span');
+          imgs[atual].classList.remove('ativa');
+          dots[atual].classList.remove('ativa');
+          atual = (atual + 1) % imgs.length;
+          imgs[atual].classList.add('ativa');
+          dots[atual].classList.add('ativa');
+        }, 2800);
+      }
+    }
+
+    if(data.video_url){
+      document.getElementById('c-video').src = data.video_url;
+      document.getElementById('c-video-section').style.display = 'block';
+
+      // moldura + legenda + coraçõezinhos, exclusivo do pacote Para sempre
+      if(data.pacote === 'para-sempre'){
+        const wrapper = document.getElementById('c-video-wrapper');
+        wrapper.classList.add('moldura');
+        ['💛','✨','💛','✨'].forEach((emoji, i) => {
+          const c = document.createElement('span');
+          c.className = 'coracao';
+          c.textContent = emoji;
+          c.style.top = (10 + i * 20) + '%';
+          c.style.left = i % 2 === 0 ? '4%' : '90%';
+          c.style.animationDelay = (i * 0.6) + 's';
+          wrapper.appendChild(c);
+        });
+        if(data.legenda){
+          const leg = document.createElement('div');
+          leg.className = 'video-legenda';
+          leg.textContent = data.legenda;
+          wrapper.appendChild(leg);
+        }
+      }
+    }
+
+    // música de fundo
+    if(data.musica){
+      const { data: pub } = supabaseClient.storage.from('homenagens-arquivos').getPublicUrl(`musicas/${data.musica}.mp3`);
+      const audio = document.getElementById('c-audio');
+      audio.src = pub.publicUrl;
+      document.getElementById('musica-player').style.display = 'flex';
+      const btnMusica = document.getElementById('btn-musica');
+      btnMusica.addEventListener('click', () => {
+        if(audio.paused){ audio.play(); btnMusica.textContent = '⏸️ Pausar música'; }
+        else { audio.pause(); btnMusica.textContent = '🎵 Tocar música'; }
+      });
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('envelope-screen').classList.add('show');
+  }
+
+  document.getElementById('envelope-screen').addEventListener('click', function(){
+    this.classList.add('hidden');
+    document.getElementById('conteudo').classList.add('show');
+  });
+
+  document.getElementById('btn-baixar').addEventListener('click', async () => {
+    const btn = document.getElementById('btn-baixar');
+    btn.textContent = 'Gerando imagem...';
+    btn.disabled = true;
+    try{
+      const canvas = await html2canvas(document.getElementById('captura'), { backgroundColor: '#F1E9D4', useCORS: true, scale: 2 });
+      const link = document.createElement('a');
+      link.download = 'homenagem-dia-dos-pais.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }catch(e){
+      alert('Não foi possível gerar a imagem agora. Tente novamente.');
+    }finally{
+      btn.textContent = 'Baixar como imagem';
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById('btn-compartilhar').addEventListener('click', () => {
+    navigator.clipboard.writeText(window.location.href);
+    const btn = document.getElementById('btn-compartilhar');
+    btn.textContent = 'Link copiado!';
+    setTimeout(() => btn.textContent = 'Copiar link', 1500);
+  });
+
+  carregar();
+</script>
+</body>
+</html>
